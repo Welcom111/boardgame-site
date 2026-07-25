@@ -1,0 +1,113 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#161d2d">
+<title>Коллекция игр</title>
+<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+<style>
+:root{--ink:#172033;--muted:#687086;--paper:#f7f4ed;--line:#e8e2d8;--accent:#e95f3d;--gold:#f3b83f;--navy:#161d2d;--radius:22px;--shadow:0 18px 45px rgba(20,29,46,.12)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--ink);background:radial-gradient(circle at 12% 8%,rgba(233,95,61,.18),transparent 24rem),radial-gradient(circle at 92% 18%,rgba(243,184,63,.13),transparent 22rem),var(--paper);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select{font:inherit}
+.hero{position:relative;overflow:hidden;color:#fff;background:var(--navy);padding:24px clamp(20px,5vw,72px) 92px}
+.hero:before,.hero:after{content:"";position:absolute;border:1px solid rgba(255,255,255,.08);border-radius:50%}
+.hero:before{width:360px;height:360px;right:-90px;top:-205px}.hero:after{width:240px;height:240px;right:80px;top:-155px}
+.topbar,.hero-content,main{width:min(1440px,100%);margin-inline:auto}
+.topbar{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.brand{display:inline-flex;align-items:center;gap:11px;color:#fff;text-decoration:none;font-size:15px;font-weight:750;letter-spacing:.02em}
+.brand-mark{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:var(--accent);box-shadow:0 8px 18px rgba(233,95,61,.28);font-size:20px}
+.top-nav{display:flex;align-items:center;gap:6px}.top-nav a{padding:9px 12px;border-radius:11px;color:rgba(255,255,255,.72);text-decoration:none;font-size:13px;font-weight:700;transition:.2s}.top-nav a:hover{color:#fff;background:rgba(255,255,255,.08)}
+.hero-content{position:relative;z-index:1;padding-top:62px}
+.eyebrow{margin:0 0 12px;color:#f6c55e;font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+h1{max-width:760px;margin:0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(38px,6vw,72px);font-weight:500;line-height:.98;letter-spacing:-.035em}
+.hero-copy{max-width:560px;margin:20px 0 0;color:rgba(255,255,255,.66);font-size:16px;line-height:1.65}
+main{position:relative;z-index:2;margin-top:-48px;padding:0 clamp(16px,3vw,34px) 70px}
+.toolbar{display:grid;grid-template-columns:minmax(240px,1fr) auto auto auto;align-items:center;gap:14px;padding:16px;border:1px solid rgba(255,255,255,.82);border-radius:20px;background:rgba(255,255,255,.88);box-shadow:var(--shadow);backdrop-filter:blur(16px)}
+.search-wrap{position:relative}.search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:#8990a0;pointer-events:none}
+.search-input,.sort-select{width:100%;height:46px;border:1px solid var(--line);border-radius:13px;outline:0;color:var(--ink);background:#faf9f6;transition:.2s}
+.search-input{padding:0 16px 0 44px}.sort-select{min-width:190px;padding:0 38px 0 14px;cursor:pointer}
+.search-input:focus,.sort-select:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 4px rgba(233,95,61,.11)}
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.filter-group{display:flex;gap:4px;padding:4px;border-radius:14px;background:#f0ede7}
+.filter-btn{min-height:38px;padding:0 14px;border:0;border-radius:10px;color:var(--muted);background:transparent;cursor:pointer;font-size:13px;font-weight:750;transition:.2s}
+.filter-btn:hover{color:var(--ink)}.filter-btn.active{color:#fff;background:var(--navy);box-shadow:0 4px 10px rgba(22,29,45,.16)}
+.random-btn{height:46px;padding:0 16px;border:0;border-radius:13px;color:#fff;background:var(--accent);cursor:pointer;font-weight:800;white-space:nowrap;box-shadow:0 7px 16px rgba(233,95,61,.22);transition:.2s}.random-btn:hover{transform:translateY(-1px);background:#f06a47}.random-btn:focus-visible,.filter-btn:focus-visible{outline:3px solid rgba(233,95,61,.25);outline-offset:2px}
+.collection-meta{margin:40px 2px 20px}.collection-meta h2{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(27px,3vw,38px);font-weight:500;letter-spacing:-.025em}
+#filter-count{margin:7px 0 0;color:var(--muted);font-size:14px}
+.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:22px}
+.favorite-group-title{grid-column:1/-1;display:flex;align-items:end;justify-content:space-between;gap:16px;margin:20px 2px -4px;padding-bottom:12px;border-bottom:1px solid var(--line)}.favorite-group-title:first-child{margin-top:0}.favorite-group-title h3{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(23px,2.5vw,31px);font-weight:500;letter-spacing:-.02em}.favorite-group-title span{color:var(--muted);font-size:13px;white-space:nowrap}
+.game-card{overflow:hidden;border:1px solid rgba(221,215,204,.8);border-radius:var(--radius);background:rgba(255,255,255,.96);box-shadow:0 7px 22px rgba(24,31,48,.06);transition:transform .25s,box-shadow .25s,border-color .25s}.game-card.random-pick{animation:pickPulse 1.2s ease;outline:4px solid rgba(233,95,61,.28)}
+@keyframes pickPulse{0%,100%{transform:translateY(0)}35%{transform:translateY(-10px) scale(1.015)}}
+.game-card:hover{transform:translateY(-5px);border-color:rgba(233,95,61,.28);box-shadow:0 20px 42px rgba(24,31,48,.14)}.game-card.hidden-card{display:none}
+.cover-wrap{position:relative;height:260px;overflow:hidden;background:linear-gradient(145deg,#e9e5dc,#d9d5cd)}
+.cover-wrap:after{content:"";position:absolute;inset:auto 0 0;height:38%;background:linear-gradient(transparent,rgba(10,15,25,.28));pointer-events:none}
+.game-img{width:100%;height:100%;display:block;object-fit:cover;transition:transform .45s}.game-card:hover .game-img{transform:scale(1.035)}
+.cover-placeholder{display:grid;place-items:center;width:100%;height:100%;color:#858b98;background:linear-gradient(135deg,transparent 45%,rgba(255,255,255,.32) 45% 55%,transparent 55%),#e4e0d7;font-size:55px}
+.favorite-badge,.rating-badge{position:absolute;z-index:1;top:14px;display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:0 10px;border-radius:999px;color:#fff;background:rgba(22,29,45,.83);box-shadow:0 4px 12px rgba(10,14,24,.18);backdrop-filter:blur(8px);font-size:12px;font-weight:800}
+.favorite-badge{right:14px;color:#ffd56f}.rating-badge{left:14px}.rating-badge .star{color:var(--gold)}
+.card-body{padding:20px}.game-title{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:21px;font-weight:600;line-height:1.25;overflow-wrap:anywhere}
+.game-id{margin-top:6px;color:#9297a3;font-size:11px;letter-spacing:.06em}.facts{display:flex;gap:8px;margin:18px 0}
+.fact{flex:1;padding:9px 10px;border-radius:11px;color:#4e5668;background:#f5f2ec;font-size:12px;font-weight:700;text-align:center;white-space:nowrap}
+.categories{display:flex;flex-wrap:wrap;gap:6px;min-height:26px}.category{max-width:100%;overflow:hidden;padding:5px 9px;border:1px solid #e8e3da;border-radius:999px;color:var(--muted);font-size:11px;text-overflow:ellipsis;white-space:nowrap}.category-hidden{display:none}.categories.expanded .category-hidden{display:inline-flex}
+.category-more{border:1px solid #f6d7ce;color:#c84628;background:#fff3ee;cursor:pointer;font-weight:800;transition:.2s}.category-more:hover{color:#a9341b;background:#ffe8df;border-color:#efb9a9}.category-more:focus-visible{outline:3px solid rgba(233,95,61,.22);outline-offset:2px}.categories.expanded .category-more{color:var(--muted);background:#f5f2ec;border-color:#e8e3da}.empty-state{display:none;padding:70px 20px;border:1px dashed #d8d1c5;border-radius:var(--radius);color:var(--muted);text-align:center;background:rgba(255,255,255,.52)}
+.empty-state.visible{display:block}.empty-icon{display:block;margin-bottom:12px;font-size:44px}
+#img-zoom-overlay{display:none;position:fixed;z-index:9999;width:320px;max-height:430px;object-fit:cover;pointer-events:none;border:4px solid #fff;border-radius:18px;box-shadow:0 22px 70px rgba(10,14,24,.38)}
+@media(max-width:1050px){.toolbar{grid-template-columns:1fr 1fr}.search-wrap{grid-column:1/-1}.filter-group{justify-content:center}}
+@media(max-width:620px){.hero{padding:18px 18px 78px}.hero-content{padding-top:46px}.hero-copy{font-size:14px}.brand span:last-child{display:none}.top-nav{gap:2px}.top-nav a{padding:8px 7px;font-size:11px}main{margin-top:-42px;padding-inline:12px}.toolbar{grid-template-columns:1fr;padding:12px}.search-wrap{grid-column:auto}.filter-group{width:100%;overflow-x:auto;justify-content:flex-start}.filter-btn{flex:1 0 auto}.sort-select{min-width:0}.random-btn{width:100%}.collection-meta{margin-top:30px}.games-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.cover-wrap{height:190px}.card-body{padding:14px}.game-title{font-size:17px}.facts{flex-direction:column;gap:5px;margin:13px 0}.fact{padding:7px}.categories{margin-top:2px}.favorite-badge{right:9px;top:9px}.rating-badge{left:9px;top:9px}#img-zoom-overlay{display:none!important}}
+@media(max-width:390px){.games-grid{grid-template-columns:1fr}.cover-wrap{height:280px}}
+</style>
+</head>
+<body>
+<header class="hero">
+<nav class="topbar" aria-label="Основная навигация">
+<a class="brand" href="{{ url_for('index') }}"><span class="brand-mark">♟</span><span>Полка настольных игр</span></a>
+<div class="top-nav"><a href="{{ url_for('games') }}">Все игры</a><a href="{{ url_for('filter_games') }}">Подобрать</a><a href="{{ url_for('add_game') }}">Добавить игру</a></div>
+</nav>
+<div class="hero-content"><p class="eyebrow">Моя игровая библиотека</p><h1>Выберите игру<br>для этого вечера</h1><p class="hero-copy">Просматривайте коллекцию, находите любимые игры и быстро сравнивайте время партии, состав и рейтинг.</p></div>
+</header>
+<main>
+<section class="toolbar" aria-label="Поиск и фильтры">
+<label class="search-wrap"><span class="search-icon" aria-hidden="true">⌕</span><input id="game-search" class="search-input" type="search" placeholder="Найти игру или категорию…" autocomplete="off"></label>
+<div class="filter-group" role="group" aria-label="Фильтр избранного"><button type="button" class="filter-btn active" data-filter="all">Все</button><button type="button" class="filter-btn" data-filter="yes">★ Избранные</button><button type="button" class="filter-btn" data-filter="no">Остальные</button></div>
+<label><span class="visually-hidden">Сортировка</span><select id="game-sort" class="sort-select"><option value="default">Сначала как в коллекции</option><option value="name">По названию</option><option value="rating">По рейтингу</option><option value="time">По времени партии</option></select></label>
+<button id="random-game" class="random-btn" type="button" title="Выбрать случайную игру из показанных">⚄ Случайная игра</button>
+</section>
+<div class="collection-meta"><h2 id="collection-title">Коллекция</h2><p id="filter-count" aria-live="polite"></p></div>
+<section id="games-grid" class="games-grid" aria-label="Список игр">
+{% for game in games %}
+<article class="game-card" data-index="{{ loop.index }}" data-favorite="{{ 'yes' if game.favorite else 'no' }}" data-favorite-label="{{ (game.favorite or '')|e }}" data-name="{{ game.name|lower }}" data-categories="{{ (game.categories or '')|lower }}" data-rating="{{ game.rating or 0 }}" data-time="{{ game.playing_time or 0 }}">
+<div class="cover-wrap">
+{% if game.image_path and game.image_path != '' %}
+<img src="{{ url_for('static', filename=game.image_path) }}" class="game-img" alt="Обложка игры {{ game.name }}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><span class="cover-placeholder" style="display:none" aria-hidden="true">🎲</span>
+{% else %}<span class="cover-placeholder" aria-hidden="true">🎲</span>{% endif %}
+{% if game.rating %}<span class="rating-badge"><span class="star">★</span> {{ game.rating }}</span>{% endif %}
+{% if game.favorite %}<span class="favorite-badge" title="В избранном">★</span>{% endif %}
+</div>
+<div class="card-body"><h3 class="game-title">{{ game.name }}</h3><div class="game-id">BGG · {{ game.id }}</div>
+<div class="facts"><span class="fact">♟ {{ game.min_players }}–{{ game.max_players }} игроков</span><span class="fact">◷ {{ game.playing_time }} мин</span></div>
+<div class="categories">{% if game.categories %}{% set category_list = game.categories.split('; ') %}{% for category in category_list %}<span class="category{% if loop.index > 2 %} category-hidden{% endif %}">{{ category }}</span>{% endfor %}{% if category_list|length > 2 %}<button class="category category-more" type="button" aria-expanded="false" data-count="{{ category_list|length - 2 }}" aria-label="Показать ещё {{ category_list|length - 2 }} жанра">+{{ category_list|length - 2 }}</button>{% endif %}{% else %}<span class="category">Без категории</span>{% endif %}</div>
+</div></article>
+{% endfor %}
+</section>
+<div id="empty-state" class="empty-state"><span class="empty-icon">🎲</span><strong>Ничего не нашлось</strong><div style="margin-top:6px">Попробуйте изменить запрос или фильтр.</div></div>
+</main>
+<img id="img-zoom-overlay" src="" alt="Увеличенная обложка">
+<script>
+const grid=document.getElementById('games-grid'),cards=[...grid.querySelectorAll('.game-card')],searchInput=document.getElementById('game-search'),sortSelect=document.getElementById('game-sort'),count=document.getElementById('filter-count'),collectionTitle=document.getElementById('collection-title'),emptyState=document.getElementById('empty-state');let favoriteMode='all';
+const numberValue=value=>Number.parseFloat(String(value).replace(',','.'))||0;
+const compareCards=(a,b)=>{const mode=sortSelect.value;if(mode==='name')return a.dataset.name.localeCompare(b.dataset.name,'ru');if(mode==='rating')return numberValue(b.dataset.rating)-numberValue(a.dataset.rating);if(mode==='time')return numberValue(a.dataset.time)-numberValue(b.dataset.time);return numberValue(a.dataset.index)-numberValue(b.dataset.index)};
+function clearGroupTitles(){grid.querySelectorAll('.favorite-group-title').forEach(title=>title.remove())}
+function arrangeCards(){clearGroupTitles();const sorted=[...cards].sort(compareCards);if(favoriteMode!=='yes'){sorted.forEach(card=>grid.appendChild(card));return}const groups=new Map();sorted.filter(card=>card.dataset.favorite==='yes').forEach(card=>{const label=card.dataset.favoriteLabel.trim()||'Избранное';if(!groups.has(label))groups.set(label,[]);groups.get(label).push(card)});groups.forEach((groupCards,label)=>{const visible=groupCards.filter(card=>!card.classList.contains('hidden-card'));if(!visible.length)return;const heading=document.createElement('div');heading.className='favorite-group-title';const title=document.createElement('h3');title.textContent=label;const total=document.createElement('span');total.textContent=visible.length+' '+gameWord(visible.length);heading.append(title,total);grid.appendChild(heading);groupCards.forEach(card=>grid.appendChild(card))})}
+function gameWord(value){const n=Math.abs(value)%100,n1=n%10;if(n>10&&n<20)return'игр';if(n1===1)return'игра';if(n1>=2&&n1<=4)return'игры';return'игр'}
+function updateCollection(){const query=searchInput.value.trim().toLocaleLowerCase('ru');let visibleCount=0,modeTotal=0;cards.forEach(card=>{const matchesFavorite=favoriteMode==='all'||card.dataset.favorite===favoriteMode;if(matchesFavorite)modeTotal++;const searchable=card.dataset.name+' '+card.dataset.categories+' '+card.dataset.favoriteLabel.toLocaleLowerCase('ru'),visible=matchesFavorite&&(!query||searchable.includes(query));card.classList.toggle('hidden-card',!visible);if(visible)visibleCount++});collectionTitle.textContent=favoriteMode==='yes'?'Избранное':'Коллекция';count.textContent='Показано '+visibleCount+' из '+modeTotal;emptyState.classList.toggle('visible',visibleCount===0);arrangeCards()}
+function sortCards(){arrangeCards()}
+document.querySelectorAll('.filter-btn').forEach(button=>button.addEventListener('click',()=>{favoriteMode=button.dataset.filter;document.querySelectorAll('.filter-btn').forEach(item=>item.classList.toggle('active',item===button));updateCollection()}));searchInput.addEventListener('input',updateCollection);sortSelect.addEventListener('change',()=>sortCards(sortSelect.value));updateCollection();
+document.getElementById('random-game').addEventListener('click',()=>{const visible=cards.filter(card=>!card.classList.contains('hidden-card'));if(!visible.length)return;cards.forEach(card=>card.classList.remove('random-pick'));const pick=visible[Math.floor(Math.random()*visible.length)];pick.classList.add('random-pick');pick.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>pick.classList.remove('random-pick'),1800)});
+document.querySelectorAll('.category-more').forEach(button=>button.addEventListener('click',()=>{const categories=button.closest('.categories'),expanded=categories.classList.toggle('expanded');button.setAttribute('aria-expanded',String(expanded));button.textContent=expanded?'Свернуть':'+'+button.dataset.count;button.setAttribute('aria-label',expanded?'Свернуть список жанров':'Показать ещё '+button.dataset.count+' жанра')}));
+const overlay=document.getElementById('img-zoom-overlay');document.querySelectorAll('.game-img').forEach(img=>{img.addEventListener('mouseenter',event=>{if(window.innerWidth<=620)return;overlay.src=img.src;overlay.style.display='block';positionOverlay(event)});img.addEventListener('mousemove',positionOverlay);img.addEventListener('mouseleave',()=>overlay.style.display='none')});
+function positionOverlay(event){const width=320,offset=18;let x=event.clientX+offset,y=event.clientY+offset;if(x+width>window.innerWidth)x=event.clientX-width-offset;if(y+430>window.innerHeight)y=Math.max(12,window.innerHeight-442);overlay.style.left=x+'px';overlay.style.top=y+'px'}
+</script>
+</body>
+</html>
