@@ -1,0 +1,6 @@
+# Local secrets
+local_config.py
+
+# Python
+__pycache__/
+*.py[cod]
